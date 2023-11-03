@@ -5,8 +5,10 @@ const { dbConnection } = require('../database/config')
 class Server {
 
     #PUERTO = process.env.PUERTO
-    #router = require('../routes/user')
-    #paths = '/api/users'
+    #userRouter = require('../routes/user')
+    #loginRouter= require('../routes/login')
+    #userPath = '/api/users'
+    #loginPath = '/api/auth'
 
     constructor() {
         this.app = express()
@@ -20,7 +22,8 @@ class Server {
     }
 
     routes() {
-        this.app.use(this.#paths, this.#router)
+        this.app.use(this.#loginPath, this.#loginRouter)
+        this.app.use(this.#userPath, this.#userRouter)
     }
 
     middlewares() {

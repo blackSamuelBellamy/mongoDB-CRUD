@@ -1,32 +1,49 @@
 const { check } = require('express-validator')
 const {esRolValido, existeEmail, existeId} = require('./db-validator')
-const validar = require('../middleware/validar-campos')
+const {
+    validarCampos, 
+    validarJWT, 
+    validarRole, 
+    validarRoleAdmin
+} = require('../middleware')
 
-const POST = [
+
+const POST_USER = [
     check('nombre', 'Nombre no debe estar vacío').notEmpty(),
     check('correo', 'No es un correo válido').isEmail(),
     check('correo').custom(existeEmail),
     check('password', 'Contraseña debe tener al menos 6 caracteres').isLength({min: 6}),
     check('rol').custom(esRolValido),
-    validar
+    validarCampos
+]
+
+const POST_LOGIN = [
+    check('correo', 'Correo no debe estar vacío').notEmpty(),
+    check('correo', 'No es un correo válido').isEmail(),
+    check('password', 'Contraseña es obligatoria').notEmpty(),
+    validarCampos
 ]
 
 const PUT = [
     check('id', 'El Id no es Válido').isMongoId(),
     check('id').custom(existeId),
     check('rol').custom(esRolValido),
-    validar
+    validarCampos
 ]
 
 const DELETE = [
+    validarJWT,
+    validarRole('ADMIN_ROLE', 'USER_ROLE'),
+    validarRoleAdmin,
     check('id', 'El Id no es Válido').isMongoId(),
     check('id').custom(existeId),
-    validar
+    validarCampos
 ]
 
 
 module.exports = {
-    POST,
+    POST_USER,
+    POST_LOGIN,
     PUT,
     DELETE
 }

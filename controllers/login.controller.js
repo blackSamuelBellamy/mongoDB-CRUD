@@ -2,6 +2,7 @@ const { request, response } = require('express')
 const Usuario = require('../models/usuario')
 const bcryptjs = require('bcryptjs')
 const generarJWT = require('../helpers/jwt')
+const googleVerify = require('../helpers/google-verify')
 
 const controller = {
 
@@ -27,17 +28,57 @@ const controller = {
                 })
             }
 
-            const token = await generarJWT(usuario.id)   
-    
-    
+            const token = await generarJWT(usuario.id)
+
+
             res.json({
-            usuario,
-            token
+                usuario,
+                token
             })
         } catch (e) {
             console.log(e)
             res.status(500).json({
                 message: "hubo un error"
+            })
+        }
+    },
+    loginPostGoogle: async (req = request, res = response) => {
+        try {
+            const { id_token } = req.body
+            const { nombre, correo, img } = await googleVerify(id_token)
+            let usuario = await Usuario.findOne({ correo })
+
+            if (!usuario) {
+                const data = {
+                    nombre,
+                    correo,
+                    img,
+                    rol: 'USER_ROLE',
+                    password: 'nuewOne',
+                    google: true
+                }
+                const usuario = new Usuario(data)
+                await usuario.save()
+            }
+
+            if(!usuario.estado) {
+                return res.status(401).json({
+                    messsage: 'Hable con el administrador'
+                })
+            }
+
+            const token = await generarJWT(usuario.id)
+
+            res.json({
+                message: 'Todo ok',
+                usuario,
+                token
+            })
+        } catch (e) {
+            console.log(e)
+            res.status(400).json({
+                message: "hubo un error en la autenticación"
+    
             })
         }
     }

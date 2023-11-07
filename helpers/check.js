@@ -24,6 +24,11 @@ const POST_LOGIN = [
     validarCampos
 ]
 
+const POST_LOGIN_GOOGLE = [
+    check('id_token', 'id_token es necesario').notEmpty(),
+    validarCampos
+]
+
 const PUT = [
     check('id', 'El Id no es Válido').isMongoId(),
     check('id').custom(existeId),
@@ -44,6 +49,7 @@ const DELETE = [
 module.exports = {
     POST_USER,
     POST_LOGIN,
+    POST_LOGIN_GOOGLE,
     PUT,
     DELETE
 }

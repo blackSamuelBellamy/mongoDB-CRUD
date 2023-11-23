@@ -17,7 +17,6 @@ const validarRole = (...roles) => {
 
 
 const validarRoleAdmin = async (req, res = response, next) => {
-
     if(!req.admin) return res.status(500).json({
         message: "No se ha validado el token"
     })
